@@ -116,16 +116,26 @@ curveWithNubsTile c = blankTile <> curvedRoad c <> case c of
     BL -> nub T <> nub R
     BR -> nub T <> nub L
 
+undies :: Diagram B
+undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts 
+    where 
+        opts = with & radiusTL .~ -1/3
+                    & radiusTR .~ -1/3
+
+undiesWithNub rot = rotateBy rot $ undies <> nub B <> blankTile
+
 -- todo get all tiles as data
+-- todo colors
 fullTiles = vcat
     [ mconcat (map nub directions) <> blankTile
     , doubleCurvedRoadTiles
     , hcat (map straightWithNubsTile [T,R]) 
     , hcat (map curveWithNubsTile corners)
+    , hcat (map undiesWithNub [0, 1/4, 1/2, 3/4])
     ]
 
 main :: IO ()
 main = do
     putStrLn "Generating new circle"
-    mainWith fullTiles 
+    mainWith fullTiles
 
