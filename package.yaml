@@ -18,6 +18,7 @@ dependencies:
   - diagrams-svg
   - colour
   - random
+  - split
 
 executables:
   bg-diagrams:

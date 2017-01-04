@@ -9,6 +9,7 @@ import Diagrams.Prelude
 import Diagrams.Backend.SVG.CmdLine
 import System.Random
 import Control.Monad
+import Data.List.Split (chunksOf)
 
 data Corner = TL | TR | BL | BR
     deriving (Show, Eq, Enum)
@@ -25,10 +26,6 @@ corners = enumFromTo TL BR
 -- Possible colors that can fill in the tiles
 colors :: (Ord a, Floating a) => [Colour a]
 colors = [lightblue, wheat, pink]
-
-randomColorStream g =  do
-    let indices = randomRs (0,2 :: Int) g
-    mapM (pure . (colors !!)) indices
 
 opCorner :: Corner -> Corner
 opCorner = \case
@@ -172,8 +169,25 @@ fullTilesNoBack =
      ++ map straightWithNubs [T,R]
      ++ map undiesWithNub [0, 1/4, 1/2, 3/4]
 
+-- TODO: really what we want is 
+-- genTile :: RandomGen g => g -> Tile
+
+randomTiles :: RandomGen g => g -> [Diagram B]
+randomTiles g =  do
+    index <- randomRs (0, length fullTilesNoBack-1 :: Int) g
+    pure $ fullTilesNoBack !! index
+
+randomColorStream g =  do
+    index <- randomRs (0,2 :: Int) g
+    pure $ colors !! index
+
+layoutTiles = vcat . map hcat . chunksOf 10
+
 main :: IO ()
 main = do
-    putStrLn "Generating new circle"
-    mainWith $ hcat fullTilesNoBack
+    putStrLn "Generating new tiles"
+    gen <- newStdGen
+    let tiles' = take 100 $ randomTiles gen
+    let colors' = randomColorStream gen
+    mainWith $ layoutTiles $ zipWith fc colors' tiles'
 
