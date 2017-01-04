@@ -7,6 +7,8 @@ module Main where
 
 import Diagrams.Prelude
 import Diagrams.Backend.SVG.CmdLine
+import System.Random
+import Control.Monad
 
 data Corner = TL | TR | BL | BR
     deriving (Show, Eq, Enum)
@@ -20,6 +22,14 @@ directions = enumFromTo T B
 corners :: [Corner]
 corners = enumFromTo TL BR
 
+-- Possible colors that can fill in the tiles
+colors :: (Ord a, Floating a) => [Colour a]
+colors = [lightblue, wheat, pink]
+
+randomColorStream g =  do
+    let indices = randomRs (0,2 :: Int) g
+    mapM (pure . (colors !!)) indices
+
 opCorner :: Corner -> Corner
 opCorner = \case
     TL -> BR
@@ -27,10 +37,11 @@ opCorner = \case
     TR -> BL
     BL -> TR
 
-onTile = (<> blankTile)
 
 blankTile :: Diagram B
 blankTile = square 1 # fc lightgreen 
+
+onTile = (<> blankTile)
 
 -- Align a diagram to the top, right, left or bottom
 alignTile :: CDir -> Diagram B -> Diagram B
@@ -86,8 +97,11 @@ nubTile c = onTile (nub c)
 curvedRoadTile :: Corner -> Diagram B
 curvedRoadTile = onTile . curvedRoad
 
+doubleCurvedRoad :: Corner -> Diagram B
+doubleCurvedRoad c = curvedRoad c <> curvedRoad (opCorner c)
+
 doubleCurvedRoadTile :: Corner -> Diagram B
-doubleCurvedRoadTile c = onTile $ curvedRoad c <> curvedRoad (opCorner c)
+doubleCurvedRoadTile c = onTile $ doubleCurvedRoad c
 
 curvedRoadTiles :: Diagram B
 curvedRoadTiles = hcat $ map curvedRoadTile (enumFromTo TL BR)
@@ -110,27 +124,25 @@ straightRoadTiles = hcat $ map straightRoadTile [T,L]
 
 nubTiles = hcat $ map nubTile [T,L,B,R]
 
-tiles :: Diagram B
-tiles = vcat
-    [ curvedRoadTiles
-    , doubleCurvedRoadTiles
-    , straightRoadTiles
-    , nubTiles
-    ]
-
-straightWithNubsTile :: CDir -> Diagram B
-straightWithNubsTile c = onTile $ straightRoad c <> case c of
+straightWithNubs :: CDir -> Diagram B
+straightWithNubs c = straightRoad c <> case c of
     T -> nub L <> nub R
     R -> nub T <> nub B
     B -> nub L <> nub R
     L -> nub T <> nub B
 
-curveWithNubsTile :: Corner -> Diagram B
-curveWithNubsTile c = onTile $ curvedRoad c <> case c of
+straightWithNubsTile :: CDir -> Diagram B
+straightWithNubsTile = onTile . straightWithNubs
+
+curveWithNubs :: Corner -> Diagram B
+curveWithNubs c = curvedRoad c <> case c of
     TR -> nub B <> nub L
     TL -> nub B <> nub R
     BL -> nub T <> nub R
     BR -> nub T <> nub L
+
+curveWithNubsTile :: Corner -> Diagram B
+curveWithNubsTile = onTile . curveWithNubs 
 
 undies :: Diagram B
 undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts # fc palegoldenrod
@@ -143,7 +155,8 @@ undiesWithNub rot = rotateBy rot $ undies <> nub B
 undiesWithNubTile = onTile . undiesWithNub
 
 -- todo get all tiles as data
--- todo colors
+-- todo get all tiles without back as data
+-- todo random colors
 fullTiles = vcat
     [ mconcat (map nub directions) <> blankTile
     , doubleCurvedRoadTiles
@@ -152,8 +165,16 @@ fullTiles = vcat
     , hcat (map undiesWithNubTile [0, 1/4, 1/2, 3/4])
     ]
 
+fullTilesNoBack = 
+    [ mconcat (map nub directions)
+    , doubleCurvedRoad TL
+    , doubleCurvedRoad TR
+    ] ++ map curveWithNubs corners
+     ++ map straightWithNubs [T,R]
+     ++ map undiesWithNub [0, 1/4, 1/2, 3/4]
+
 main :: IO ()
 main = do
     putStrLn "Generating new circle"
-    mainWith fullTiles
+    mainWith $ hcat fullTilesNoBack
 

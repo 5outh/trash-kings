@@ -17,6 +17,7 @@ dependencies:
   - diagrams-lib
   - diagrams-svg
   - colour
+  - random
 
 executables:
   bg-diagrams:
