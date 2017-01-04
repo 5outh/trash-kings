@@ -25,4 +25,5 @@ executable bg-diagrams
     , diagrams
     , diagrams-lib
     , diagrams-svg
+    , colour
   default-language: Haskell2010
