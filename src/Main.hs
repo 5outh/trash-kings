@@ -28,14 +28,6 @@ corners = enumFromTo TL BR
 colors :: (Ord a, Floating a) => [Colour a]
 colors = [lightblue, wheat, pink]
 
-opCorner :: Corner -> Corner
-opCorner = \case
-    TL -> BR
-    BR -> TL
-    TR -> BL
-    BL -> TR
-
-
 blankTile :: Diagram B
 blankTile = square 1 # fc lightgreen 
 
@@ -88,24 +80,6 @@ nub c = trans c $ wedge (1/6) (d c) a
 
         a = (tau / 2) @@ rad
 
-nubTile :: CDir -> Diagram B
-nubTile c = onTile (nub c)
-
-curvedRoadTile :: Corner -> Diagram B
-curvedRoadTile = onTile . curvedRoad
-
-doubleCurvedRoad :: Corner -> Diagram B
-doubleCurvedRoad c = curvedRoad c <> curvedRoad (opCorner c)
-
-doubleCurvedRoadTile :: Corner -> Diagram B
-doubleCurvedRoadTile c = onTile $ doubleCurvedRoad c
-
-curvedRoadTiles :: Diagram B
-curvedRoadTiles = hcat $ map curvedRoadTile (enumFromTo TL BR)
-
-doubleCurvedRoadTiles :: Diagram B
-doubleCurvedRoadTiles = hcat $ map doubleCurvedRoadTile [TL, TR]
-
 straightRoad :: CDir -> Diagram B
 straightRoad = \case
     T -> rect (1/3) 1 
@@ -113,46 +87,16 @@ straightRoad = \case
     R -> rect 1 (1/3)
     L -> rect 1 (1/3)
 
-straightRoadTile :: CDir -> Diagram B
-straightRoadTile = onTile . straightRoad
-
-straightRoadTiles :: Diagram B
-straightRoadTiles = hcat $ map straightRoadTile [T,L]
-
-nubTiles = hcat $ map nubTile [T,L,B,R]
-
-straightWithNubs :: CDir -> Diagram B
-straightWithNubs c = straightRoad c <> case c of
-    T -> nub L <> nub R
-    R -> nub T <> nub B
-    B -> nub L <> nub R
-    L -> nub T <> nub B
-
 straightWithNubs' = [straightRoad T, nub L, nub R]
-
-straightWithNubsTile :: CDir -> Diagram B
-straightWithNubsTile = onTile . straightWithNubs
-
-curveWithNubs :: Corner -> Diagram B
-curveWithNubs c = curvedRoad c <> case c of
-    TR -> nub B <> nub L
-    TL -> nub B <> nub R
-    BL -> nub T <> nub R
-    BR -> nub T <> nub L
 
 curveWithNubs' = [curvedRoad TL, nub B, nub R]
 doubleCurvedRoad' = [curvedRoad TL, curvedRoad BR]
-
-curveWithNubsTile :: Corner -> Diagram B
-curveWithNubsTile = onTile . curveWithNubs 
 
 undies :: Diagram B
 undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts
     where 
         opts = with & radiusTL .~ -1/3
                     & radiusTR .~ -1/3
-
-undiesWithNub rot = rotateBy rot $ undies <> nub B
 
 undiesWithNub' = [undies <> nub B]
 
@@ -203,13 +147,6 @@ genTile = do
 
 genTiles :: (RandomGen g, MonadState g m) => Int -> m [Diagram B]
 genTiles n = replicateM n genTile
-
-randomSeq :: RandomGen g => g -> [a] -> [a]
-randomSeq g xs = do
-    index <- randomRs (0, length xs-1 :: Int) g
-    pure $ xs !! index
-
-randomColorStream g = randomSeq g colors
 
 layoutTiles = vcat . map hcat . chunksOf 10
 
