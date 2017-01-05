@@ -122,7 +122,7 @@ decomposed = \case
 tileTypes :: [TileType]
 tileTypes =
     [ Nubs
-    , Straight
+    , Straight, Straight
     , DoubleCurve, DoubleCurve
     , CurveNub, CurveNub
     , Undies
@@ -148,12 +148,12 @@ genTile = do
 genTiles :: (RandomGen g, MonadState g m) => Int -> m [Diagram B]
 genTiles n = replicateM n genTile
 
-layoutTiles = vcat . map hcat . chunksOf 10
+layoutTiles = vcat . map hcat . chunksOf 8
 
 main :: IO ()
 main = do
     putStrLn "Generating new tiles"
     gen <- newStdGen
-    let tiles' = evalState (genTiles 100) gen
+    let tiles' = evalState (genTiles 64) gen
     mainWith $ layoutTiles tiles'
 
