@@ -10,6 +10,7 @@ import Diagrams.Backend.SVG.CmdLine
 import System.Random
 import Control.Monad
 import Data.List.Split (chunksOf)
+import Control.Monad.State 
 
 data Corner = TL | TR | BL | BR
     deriving (Show, Eq, Enum)
@@ -127,6 +128,8 @@ straightWithNubs c = straightRoad c <> case c of
     B -> nub L <> nub R
     L -> nub T <> nub B
 
+straightWithNubs' = [straightRoad T, nub L, nub R]
+
 straightWithNubsTile :: CDir -> Diagram B
 straightWithNubsTile = onTile . straightWithNubs
 
@@ -136,6 +139,9 @@ curveWithNubs c = curvedRoad c <> case c of
     TL -> nub B <> nub R
     BL -> nub T <> nub R
     BR -> nub T <> nub L
+
+curveWithNubs' = [curvedRoad TL, nub B, nub R]
+doubleCurvedRoad' = [curvedRoad TL, curvedRoad BR]
 
 curveWithNubsTile :: Corner -> Diagram B
 curveWithNubsTile = onTile . curveWithNubs 
@@ -148,38 +154,62 @@ undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts
 
 undiesWithNub rot = rotateBy rot $ undies <> nub B
 
-undiesWithNubTile = onTile . undiesWithNub
+undiesWithNub' = [undies <> nub B]
 
--- todo get all tiles as data
--- todo get all tiles without back as data
--- todo random colors
-fullTiles = vcat
-    [ mconcat (map nub directions) <> blankTile
-    , doubleCurvedRoadTiles
-    , hcat (map straightWithNubsTile [T,R]) 
-    , hcat (map curveWithNubsTile corners)
-    , hcat (map undiesWithNubTile [0, 1/4, 1/2, 3/4])
+data TileType
+    = Nubs
+    | Straight
+    | DoubleCurve
+    | CurveNub
+    | Undies
+      deriving (Show, Eq, Enum)
+
+-- A decomposed tile that just needs to be
+-- mconcat'd in order to become a diagram
+decomposed :: TileType -> [Diagram B]
+decomposed = \case
+    Nubs -> map nub directions
+    Straight -> straightWithNubs'
+    DoubleCurve -> doubleCurvedRoad'
+    CurveNub -> curveWithNubs'
+    Undies -> undiesWithNub'
+
+-- The poor man's weighting...
+tileTypes :: [TileType]
+tileTypes =
+    [ Nubs
+    , Straight
+    , DoubleCurve, DoubleCurve
+    , CurveNub, CurveNub
+    , Undies
     ]
 
-fullTilesNoBack = 
-    [ mconcat (map nub directions)
-    , doubleCurvedRoad TL
-    , doubleCurvedRoad TR
-    ] ++ map curveWithNubs corners
-     ++ map straightWithNubs [T,R]
-     ++ map undiesWithNub [0, 1/4, 1/2, 3/4]
+randomElement :: (RandomGen g, MonadState g m) => [a] -> m a 
+randomElement xs = do
+    gen <- get
+    let (index, g') = randomR (0, length xs - 1 :: Int) gen
+    put g'
+    pure $ xs !! index
 
--- TODO: really what we want is 
--- genTile :: RandomGen g => g -> Tile
+genTile :: (RandomGen g, MonadState g m) => m (Diagram B)
+genTile = do
+    tileType <- randomElement tileTypes
+    let pieces = decomposed tileType 
+    alignment <- randomElement directions
+    pieces <- forM pieces $ \piece -> do
+        color <- randomElement colors
+        pure $ fc color piece
+    pure $ alignTile alignment $ onTile $ mconcat pieces
 
-randomTiles :: RandomGen g => g -> [Diagram B]
-randomTiles g =  do
-    index <- randomRs (0, length fullTilesNoBack-1 :: Int) g
-    pure $ fullTilesNoBack !! index
+genTiles :: (RandomGen g, MonadState g m) => Int -> m [Diagram B]
+genTiles n = replicateM n genTile
 
-randomColorStream g =  do
-    index <- randomRs (0,2 :: Int) g
-    pure $ colors !! index
+randomSeq :: RandomGen g => g -> [a] -> [a]
+randomSeq g xs = do
+    index <- randomRs (0, length xs-1 :: Int) g
+    pure $ xs !! index
+
+randomColorStream g = randomSeq g colors
 
 layoutTiles = vcat . map hcat . chunksOf 10
 
@@ -187,7 +217,6 @@ main :: IO ()
 main = do
     putStrLn "Generating new tiles"
     gen <- newStdGen
-    let tiles' = take 100 $ randomTiles gen
-    let colors' = randomColorStream gen
-    mainWith $ layoutTiles $ zipWith fc colors' tiles'
+    let tiles' = evalState (genTiles 100) gen
+    mainWith $ layoutTiles tiles'
 

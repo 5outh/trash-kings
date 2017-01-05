@@ -19,6 +19,7 @@ dependencies:
   - colour
   - random
   - split
+  - mtl
 
 executables:
   bg-diagrams:
