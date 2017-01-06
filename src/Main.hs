@@ -5,8 +5,9 @@
 
 module Main where
 
+import Diagrams.TwoD.Size
 import Diagrams.Prelude
-import Diagrams.Backend.SVG.CmdLine
+import Diagrams.Backend.SVG
 import System.Random
 import Control.Monad
 import Data.List.Split (chunksOf)
@@ -150,10 +151,17 @@ genTiles n = replicateM n genTile
 
 layoutTiles = vcat . map hcat . chunksOf 8
 
+renderMany :: String -> FilePath -> SizeSpec V2 Double -> [Diagram B] -> IO ()
+renderMany prefix directory spec diagrams = 
+    forM_ (zip [1..] diagrams) $ \(i, diagram) -> do
+        let filepath = directory ++ "/" ++ prefix ++ "-" ++ show i ++ ".svg"
+        renderSVG filepath spec diagram
+
 main :: IO ()
 main = do
     putStrLn "Generating new tiles"
     gen <- newStdGen
     let tiles' = evalState (genTiles 64) gen
-    mainWith $ layoutTiles tiles'
+    renderMany "tile" "tiles" (mkWidth 600) tiles'
+    renderSVG "tiles/all.svg" (mkWidth 600) $ layoutTiles tiles'
 

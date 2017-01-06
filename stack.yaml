@@ -2,6 +2,5 @@ flags: {}
 extra-package-dbs: []
 packages:
 - '.'
-extra-deps:
-- random-extras-0.19
+extra-deps: []
 resolver: lts-7.14
