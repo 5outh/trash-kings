@@ -19,6 +19,7 @@ corners = enumFromTo TL BR
 -- Possible colors that can fill in the tiles
 colors :: (Ord a, Floating a) => [Colour a]
 colors = [lightblue, wheat, pink]
+
 blankTile :: Diagram B
 blankTile = square 1
 
@@ -64,6 +65,7 @@ straightRoad = \case
     R -> rect 1 (1/3)
     L -> rect 1 (1/3)
 
+-- Pieces of the tiles
 straightWithNubs' = [straightRoad T, nub L, nub R]
 curveWithNubs' = [curvedRoad TL, nub B, nub R]
 doubleCurvedRoad' = [curvedRoad TL, curvedRoad BR]
@@ -91,14 +93,4 @@ decomposed = \case
     DoubleCurve -> doubleCurvedRoad'
     CurveNub -> curveWithNubs'
     Undies -> undiesWithNub'
-
--- The poor man's weighting...
-tileTypes :: [TileType]
-tileTypes =
-    [ Nubs
-    , Straight, Straight
-    , DoubleCurve, DoubleCurve
-    , CurveNub, CurveNub
-    , Undies
-    ]
 

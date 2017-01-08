@@ -12,9 +12,20 @@ import System.Random
 import Control.Monad
 import Data.List.Split (chunksOf)
 import Control.Monad.State 
+import Control.Monad.Random
 
 import TrashKings.Tile
 import TrashKings.Types
+
+-- The poor man's weighting...
+tileTypes :: MonadRandom m => m TileType 
+tileTypes = fromList
+    [ (Nubs, 1)
+    , (Straight, 2)
+    , (DoubleCurve, 2)
+    , (CurveNub, 2)
+    , (Undies, 1)
+    ]
 
 onTile :: Tile -> Tile
 onTile = (<> blankTile)
@@ -30,20 +41,14 @@ alignTile dir diagram = rotate' diagram
                       R -> 1/4
                       B -> 1/2
                       L -> 3/4
-randomElement :: (RandomGen g, MonadState g m) => [a] -> m a 
-randomElement xs = do
-    gen <- get
-    let (index, g') = randomR (0, length xs - 1 :: Int) gen
-    put g'
-    pure $ xs !! index
 
-genTile :: (RandomGen g, MonadState g m) => m Tile 
+genTile :: MonadRandom m => m Tile 
 genTile = do
-    tileType <- randomElement tileTypes
+    tileType <- tileTypes
     let pieces = decomposed tileType 
-    alignment <- randomElement directions
+    alignment <- uniform directions
     pieces <- forM pieces $ \piece -> do
-        color <- randomElement colors
+        color <- uniform colors
         pure $ fc color piece
     pure $ alignTile alignment $ onTile $ mconcat pieces
 
@@ -56,12 +61,13 @@ mkTile alignment colors tileType =
     alignTile alignment . onTile . mconcat $ zipWith fc colors pieces
     where pieces = decomposed tileType
 
-genTiles :: (RandomGen g, MonadState g m) => Int -> m [Diagram B]
+genTiles :: MonadRandom m => Int -> m [Tile]
 genTiles n = replicateM n genTile
 
+layoutTiles :: [Tile] -> Diagram B 
 layoutTiles = vcat . map hcat . chunksOf 4
 
-renderMany :: String -> FilePath -> SizeSpec V2 Double -> [Diagram B] -> IO ()
+renderMany :: String -> FilePath -> SizeSpec V2 Double -> [Tile] -> IO ()
 renderMany prefix directory spec diagrams = 
     forM_ (zip [1..] diagrams) $ \(i, diagram) -> do
         let filepath = directory ++ "/" ++ prefix ++ "-" ++ show i ++ ".svg"
@@ -71,7 +77,7 @@ main :: IO ()
 main = do
     putStrLn "Generating new tiles"
     gen <- newStdGen
-    let tiles' = evalState (genTiles 4) gen
+    let tiles' = evalRand (genTiles 4) gen
     renderMany "tile" "tiles" (mkWidth 600) tiles'
     renderSVG "tiles/all.svg" (mkWidth 1000) $ layoutTiles tiles'
 
