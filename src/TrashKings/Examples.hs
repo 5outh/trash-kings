@@ -24,7 +24,7 @@ example sDot eDot sPt ePt =
 doIt :: MonadRandom m => m Diagram'
 doIt = do
     let pA = p2 (0, 0)
-        pB = p2 (3, 0)
+        pB = p2 (2, 0)
     (t1, t2) <- (,) <$> genTile <*> genTile
     pure $ connectOutside "1" "2" $ example t1 t2 pA pB
 
