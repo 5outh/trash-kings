@@ -3,7 +3,7 @@ module TrashKings.Generation where
 import Control.Monad.Random
 import Diagrams.Prelude
 import Control.Monad
-import Diagrams.Backend.SVG
+import Diagrams.Backend.Rasterific
 
 import TrashKings.Layout
 import TrashKings.Tile
@@ -34,6 +34,6 @@ genTiles n = replicateM n genTile
 renderMany :: String -> FilePath -> SizeSpec V2 Double -> [Tile] -> IO ()
 renderMany prefix directory spec diagrams = 
     forM_ (zip [1..] diagrams) $ \(i, diagram) -> do
-        let filepath = directory ++ "/" ++ prefix ++ "-" ++ show i ++ ".svg"
-        renderSVG filepath spec diagram
+        let filepath = directory ++ "/" ++ prefix ++ "-" ++ show i ++ ".jpg"
+        renderRasterific filepath spec diagram
 

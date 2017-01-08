@@ -1,7 +1,7 @@
 module TrashKings.Types where
 
 import Diagrams.Prelude
-import Diagrams.Backend.SVG
+import Diagrams.Backend.Rasterific
 
 -- Some aliases to easily swap things out
 type Diagram' = Diagram B

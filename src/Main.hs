@@ -7,7 +7,7 @@ module Main where
 
 import Diagrams.TwoD.Size
 import Diagrams.Prelude
-import Diagrams.Backend.SVG
+import Diagrams.Backend.Rasterific
 import System.Random
 import Control.Monad
 import Data.List.Split (chunksOf)
@@ -23,6 +23,7 @@ main = do
     putStrLn "Generating new tiles"
     gen <- newStdGen
     let tiles' = evalRand (genTiles 4) gen
-    renderMany "tile" "tiles" (mkWidth 600) tiles'
-    renderSVG "tiles/all.svg" (mkWidth 1000) $ layoutTiles tiles'
+    renderMany "tile" "tiles" (mkWidth 675) tiles'
+    renderRasterific
+        "tiles/all.jpg" (mkWidth 1000) $ layoutTiles tiles'
 

@@ -8,7 +8,7 @@ module TrashKings.Tile where
 import TrashKings.Types
 import Diagrams.TwoD.Size
 import Diagrams.Prelude
-import Diagrams.Backend.SVG
+import Diagrams.Backend.Rasterific
 
 directions :: [CDir]
 directions = enumFromTo T B
@@ -24,7 +24,7 @@ colors = [lightblue, wheat, pink]
 (blue', yellow', red') = (lightblue, wheat, pink)
 
 blankTile :: Diagram B
-blankTile = square 1
+blankTile = square 1 # fc lightgreen
 
 curvedRoad :: Corner -> Diagram B
 curvedRoad corner = trans corner $ annularWedge (2/3) (1/3) (d corner) a
@@ -94,4 +94,8 @@ decomposed = \case
     DoubleCurve -> doubleCurvedRoad'
     CurveNub -> curveWithNubs'
     Undies -> undiesWithNub'
+
+-- Could use a little DSL here;
+-- e.g. `claimedOn L (Meeple Red) $ someTile`
+-- `highlight $ someTile` etc
 

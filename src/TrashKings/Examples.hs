@@ -2,7 +2,7 @@
 module TrashKings.Examples where
 
 import           Control.Monad.Random
-import           Diagrams.Backend.SVG
+import           Diagrams.Backend.Rasterific
 import           Diagrams.Prelude
 import           Diagrams.TwoD.Arrow
 import           Diagrams.TwoD.Size
@@ -15,8 +15,8 @@ import           TrashKings.Types
 -- Generate a named example
 genExample :: FilePath -> Diagram' -> IO ()
 genExample filepath =
-    renderSVG
-        ("examples/" <> filepath <> ".svg")
+    renderRasterific
+        ("examples/" <> filepath <> ".jpg")
         (mkWidth 1000)
 
 
