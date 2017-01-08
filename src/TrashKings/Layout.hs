@@ -9,6 +9,9 @@ import           Diagrams.Prelude
 layoutTiles :: [Tile] -> Diagram'
 layoutTiles = vcat . map hcat . chunksOf 4
 
+layoutGrid :: [[Tile]] -> Diagram'
+layoutGrid tiles = vcat $ map hcat tiles
+
 onTile :: Tile -> Tile
 onTile = (<> blankTile)
 

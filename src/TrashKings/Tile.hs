@@ -20,6 +20,9 @@ corners = enumFromTo TL BR
 colors :: (Ord a, Floating a) => [Colour a]
 colors = [lightblue, wheat, pink]
 
+-- Re-export colors in a more user-friendly way 
+(blue', yellow', red') = (lightblue, wheat, pink)
+
 blankTile :: Diagram B
 blankTile = square 1
 
@@ -70,6 +73,11 @@ straightWithNubs' = [straightRoad T, nub L, nub R]
 curveWithNubs' = [curvedRoad TL, nub B, nub R]
 doubleCurvedRoad' = [curvedRoad TL, curvedRoad BR]
 undiesWithNub' = [undies <> nub B]
+nubs' = [nub T, nub R, nub B, nub L]
+
+-- Make a tile from a list of colors and parts
+mkTile :: [Colour Double] -> [Diagram'] -> Diagram'
+mkTile colors = mconcat . zipWith fc colors
 
 undies :: Diagram B
 undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts
