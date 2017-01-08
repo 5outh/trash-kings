@@ -7,6 +7,14 @@ import Diagrams.Backend.SVG
 type Diagram' = Diagram B
 type Tile = Diagram B
 
+data TileType
+    = Nubs
+    | Straight
+    | DoubleCurve
+    | CurveNub
+    | Undies
+      deriving (Show, Eq, Enum)
+
 data Corner = TL | TR | BL | BR
     deriving (Show, Eq, Enum)
 

@@ -76,13 +76,6 @@ undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts
     where 
         opts = with & radiusTL .~ -1/3
                     & radiusTR .~ -1/3
-data TileType
-    = Nubs
-    | Straight
-    | DoubleCurve
-    | CurveNub
-    | Undies
-      deriving (Show, Eq, Enum)
 
 -- A decomposed tile that just needs to be
 -- mconcat'd in order to become a diagram
