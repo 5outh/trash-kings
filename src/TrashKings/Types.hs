@@ -3,6 +3,8 @@ module TrashKings.Types where
 import Diagrams.Prelude
 import Diagrams.Backend.SVG
 
+-- Some aliases to easily swap things out
+type Diagram' = Diagram B
 type Tile = Diagram B
 
 data Corner = TL | TR | BL | BR
