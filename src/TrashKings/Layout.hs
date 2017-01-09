@@ -12,9 +12,6 @@ layoutTiles = vcat . map hcat . chunksOf 4
 layoutGrid :: [[Tile]] -> Diagram'
 layoutGrid tiles = vcat $ map hcat tiles
 
-onTile :: Tile -> Tile
-onTile = (<> blankTile)
-
 -- Align a diagram to the top, right, left or bottom
 alignTile :: CDir -> Tile -> Tile
 alignTile dir diagram = rotate' diagram

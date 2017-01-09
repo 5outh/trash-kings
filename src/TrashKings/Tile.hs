@@ -6,9 +6,13 @@
 module TrashKings.Tile where
 
 import TrashKings.Types
+
 import Diagrams.TwoD.Size
 import Diagrams.Prelude
 import Diagrams.Backend.Rasterific
+
+onTile :: Tile -> Tile
+onTile = (<> blankTile)
 
 directions :: [CDir]
 directions = enumFromTo T B
@@ -77,7 +81,7 @@ nubs' = [nub T, nub R, nub B, nub L]
 
 -- Make a tile from a list of colors and parts
 mkTile :: [Colour Double] -> [Diagram'] -> Diagram'
-mkTile colors = mconcat . zipWith fc colors
+mkTile colors = onTile . mconcat . zipWith fc colors
 
 undies :: Diagram B
 undies = translate (r2 (0, 1/6)) $ roundedRect' 1 (2/3) opts

@@ -36,6 +36,8 @@ executable bg-diagrams
     , MonadRandom
   other-modules:
       TrashKings.Examples
+      TrashKings.Final
+      TrashKings.Generation
       TrashKings.Layout
       TrashKings.Tile
       TrashKings.Types
