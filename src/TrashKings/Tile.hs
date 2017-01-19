@@ -12,7 +12,7 @@ import Diagrams.Prelude
 import Diagrams.Backend.Rasterific
 
 onTile :: Tile -> Tile
-onTile t = (scale 0.88 t) <> blankTile
+onTile t = t <> blankTile
 
 directions :: [CDir]
 directions = enumFromTo T B
@@ -28,7 +28,7 @@ colors = [lightblue, wheat, pink]
 (blue', yellow', red') = (lightblue, wheat, pink)
 
 blankTile :: Diagram B
-blankTile = square 1 # fc lightgreen
+blankTile = square 1
 
 curvedRoad :: Corner -> Diagram B
 curvedRoad corner = trans corner $ annularWedge (2/3) (1/3) (d corner) a
