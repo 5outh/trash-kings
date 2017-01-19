@@ -12,7 +12,7 @@ import Diagrams.Prelude
 import Diagrams.Backend.Rasterific
 
 onTile :: Tile -> Tile
-onTile = (<> blankTile)
+onTile t = (scale 0.88 t) <> blankTile
 
 directions :: [CDir]
 directions = enumFromTo T B
