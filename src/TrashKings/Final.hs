@@ -20,16 +20,17 @@ allNubs = map (flip mkTile nubs') $
     [
       [b,b,y,y]
     --
-    , [r,b,b,y] 
+    , [y,y,r,r] 
     --
-    , [r,b,y,b]
+    , [r,r,b,b]
     ]
 
 allStraights = map (flip mkTile straightWithNubs') $
     [
     --
       [b,r,b]
-      --
+    --
+    , [b,r,y]
     , [b,r,y]
     --
     , [b,y,b]
@@ -42,15 +43,13 @@ allStraights = map (flip mkTile straightWithNubs') $
     , [r,y,b]
     --
     , [r,y,y]
-    , [r,y,y]
     --
+    , [y,b,r]
     , [y,b,r]
     --
     , [y,r,y]
     --
     , [y,y,b]
-    --
-    , [y,y,y]
     ]
 
 allUndies = map (flip mkTile undiesWithNub') $ 
@@ -96,13 +95,16 @@ allDoubleCurves = map (flip mkTile doubleCurvedRoad') $
       -- 
     , [b,r]
     , [b,r]
+    , [b,r]
     -- 
     , [b,y]
     , [b,y]
+    , [b,y]
     --
     , [r,r]
     , [r,r]
     --
+    , [r,y]
     , [r,y]
     , [r,y]
     --
