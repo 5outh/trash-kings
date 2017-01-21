@@ -28,7 +28,7 @@ colors = [lightblue, wheat, pink]
 (blue', yellow', red') = (lightblue, wheat, pink)
 
 blankTile :: Diagram B
-blankTile = square 1
+blankTile = square 1 # fc white
 
 curvedRoad :: Corner -> Diagram B
 curvedRoad corner = trans corner $ annularWedge (2/3) (1/3) (d corner) a

@@ -12,6 +12,12 @@ layoutTiles = vcat . map hcat . chunksOf 4
 layoutGrid :: [[Tile]] -> Diagram'
 layoutGrid tiles = vcat $ map hcat tiles
 
+layoutFinal :: [Tile] -> [Tile]
+layoutFinal ts = 
+    map (\ts' ->
+            vcat $ map hcat (chunksOf 4 ts')
+        ) (chunksOf 16 ts)
+
 -- Align a diagram to the top, right, left or bottom
 alignTile :: CDir -> Tile -> Tile
 alignTile dir diagram = rotate' diagram

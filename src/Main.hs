@@ -17,13 +17,8 @@ import TrashKings.Generation
 import TrashKings.Tile
 import TrashKings.Types
 import TrashKings.Layout
+import TrashKings.Final
 
 main :: IO ()
-main = do
-    putStrLn "Generating new tiles"
-    gen <- newStdGen
-    let tiles' = evalRand (genTiles 64) gen
-    renderMany "tile" "tiles" (mkWidth 675) tiles'
-    renderRasterific
-        "tiles/all.jpg" (mkWidth 1000) $ layoutTiles tiles'
+main = renderFinal
 
